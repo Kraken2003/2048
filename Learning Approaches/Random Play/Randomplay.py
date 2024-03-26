@@ -1,5 +1,5 @@
 import random
-from game2048 import Game2048
+from GameEmulator.RLGame import Game2048
 
 # List of all possible actions
 action_space = ['UP', 'DOWN', 'LEFT', 'RIGHT']

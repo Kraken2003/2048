@@ -1,3 +1,5 @@
+#Using Numpy array instead of pygame to optimize the code for Reinforcement Learning Algorithms
+
 import random
 import numpy as np
 

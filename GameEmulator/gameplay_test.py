@@ -1,4 +1,6 @@
-from GameCode import Game2048
+#Playing the game using automated action inputs
+
+from Game import Game2048
 import random
 import time
 

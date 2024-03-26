@@ -1,3 +1,5 @@
+#Creating a visual render of the 2048 game
+
 import random  
 import pygame  
 
