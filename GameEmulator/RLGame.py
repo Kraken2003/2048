@@ -92,6 +92,9 @@ class Game2048:
 
     def get_score(self):
         return self.score
+    
+    def check_for_win(self, board):
+        return 2048 in board
 
     def reset_game(self):
         self.board = np.zeros((4, 4), dtype=int)
