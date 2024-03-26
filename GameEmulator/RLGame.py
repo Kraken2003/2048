@@ -113,7 +113,3 @@ class Game2048:
             else:
                 print("Current board state:")
                 print(self.board)
-
-
-
-
