@@ -7,13 +7,24 @@ class Game2048:
         self.possible_moves = 4
         self.number_of_tiles = 16
 
+    def reset_game(self):
         self.board = np.zeros((self.number_of_tiles), dtype="int")
         initial_twos = random.sample(range(self.number_of_tiles), 2)
 
         self.board[initial_twos] = 2
         self.board = self.board.reshape((4, 4))
-        self.score = 0
-        self.game_over = False
+
+    def get_environment(self):
+        return self.board
+    
+    def add_new_tile(self, board):
+        empty_cells = np.argwhere(board == 0)
+        row, col = random.choice(empty_cells)
+        board[row, col] = 2 if random.random() < 0.9 else 4  # 90% chance of 2, 10% chance of 4
+        return board
+
+    def check_for_win(self, board):
+        return 2048 in board
 
     def push_board_right(self, board):
         new = np.zeros((4, 4), dtype="int")
@@ -40,66 +51,50 @@ class Game2048:
                     done = True
         return board, done, score
 
-    def move_up(self):
-        rotated_board = np.rot90(self.board, -1)
+    def move_up(self, board):
+        rotated_board = np.rot90(board, -1)
         pushed_board, has_pushed = self.push_board_right(rotated_board)
         merged_board, has_merged, score = self.merge_elements(pushed_board)
         second_pushed_board, _ = self.push_board_right(merged_board)
         rotated_back_board = np.rot90(second_pushed_board)
         move_made = has_pushed or has_merged
-        self.board = rotated_back_board
-        return move_made, score
+        board = rotated_back_board
+        return board, move_made, score
 
-    def move_down(self):
-        board = np.rot90(self.board)
+    def move_down(self, board):
+        board = np.rot90(board)
         board, has_pushed = self.push_board_right(board)
         board, has_merged, score = self.merge_elements(board)
         board, _ = self.push_board_right(board)
-        self.board = np.rot90(board, -1)
+        board = np.rot90(board, -1)
         move_made = has_pushed or has_merged
-        return move_made, score
+        return board, move_made, score
 
-    def move_left(self):
-        board = np.rot90(self.board, 2)
+    def move_left(self, board):
+        board = np.rot90(board, 2)
         board, has_pushed = self.push_board_right(board)
         board, has_merged, score = self.merge_elements(board)
         board, _ = self.push_board_right(board)
-        self.board = np.rot90(board, -2)
+        board = np.rot90(board, -2)
         move_made = has_pushed or has_merged
-        return move_made, score
+        return board, move_made, score
 
-    def move_right(self):
-        board, has_pushed = self.push_board_right(self.board)
+    def move_right(self, board):
+        board, has_pushed = self.push_board_right(board)
         board, has_merged, score = self.merge_elements(board)
         board, _ = self.push_board_right(board)
-        self.board = board
+        board = board
         move_made = has_pushed or has_merged
-        return move_made, score
+        return board ,move_made, score
 
-    def fixed_move(self):
-        move_order = [self.move_left, self.move_up, self.move_down, self.move_right]
-        for func in move_order:
-            move_made, score = func()
-            if move_made:
-                return True, score
-        return False, 0
-
-    def random_move(self):
+    def random_move(self, board):
         move_made = False
-        move_order = [self.move_right, self.move_up, self.move_down, self.move_left]
-        while not move_made and len(move_order) > 0:
-            move_index = random.randint(0, len(move_order) - 1)
-            move = move_order[move_index]
-            move_made, score = move()
+        possible_moves = [self.move_right, self.move_up, self.move_down, self.move_left]
+        while not move_made and len(possible_moves) > 0:
+            move_index = random.randint(0, len(possible_moves) - 1)
+            move = possible_moves[move_index]
+            move_made, score = move(board)
             if move_made:
-                return True, score
-            move_order.pop(move_index)
-        return False, 0
-
-    def add_new_tile(self):
-        empty_cells = np.argwhere(self.board == 0)
-        row, col = random.choice(empty_cells)
-        self.board[row, col] = 2 if random.random() < 0.9 else 4  # 90% chance of 2, 10% chance of 4
-
-    def check_for_win(self):
-        return 2048 in self.board
+                return board, True, score
+            possible_moves.pop(move_index)
+        return board, False, 0
